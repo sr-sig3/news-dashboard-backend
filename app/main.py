@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 from datetime import datetime, timedelta
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import models, schemas
 from .database import engine, get_db
@@ -10,6 +11,15 @@ from .database import engine, get_db
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# CORS 설정 추가
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React 개발 서버 주소
+    allow_credentials=True,
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용
+    allow_headers=["*"],  # 모든 헤더 허용
+)
 
 @app.get("/keywords/", response_model=List[schemas.Keyword])
 def get_keywords(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
